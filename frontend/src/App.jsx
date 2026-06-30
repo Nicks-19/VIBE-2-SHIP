@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import ReportIssue from './pages/ReportIssue';
@@ -61,7 +62,17 @@ function App() {
       </header>
 
       <main className="pt-20 px-margin-mobile max-w-container-max mx-auto space-y-6">
-        {renderPage()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activePage}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderPage()}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* FAB */}

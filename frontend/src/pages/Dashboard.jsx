@@ -1,10 +1,16 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 export default function Dashboard({ onViewIssue }) {
   return (
     <>
       {/* Header & Weather Widget */}
-      <section className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <motion.section 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-4"
+      >
         <div>
           <p className="text-on-surface-variant font-label-md uppercase tracking-wider mb-1">Thursday, Oct 24</p>
           <h2 className="font-headline-lg-mobile text-on-background">Good morning, Citizen</h2>
@@ -18,12 +24,23 @@ export default function Dashboard({ onViewIssue }) {
             <div className="text-label-md text-secondary font-semibold">Air Quality: Good (24 AQI)</div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Bento Grid Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <motion.div 
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: { opacity: 0 },
+          show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+          }
+        }}
+        className="grid grid-cols-1 md:grid-cols-12 gap-6"
+      >
         {/* Map Snippet Card (8 columns on desktop) */}
-        <section className="md:col-span-8 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-8 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-title-md">Nearby Issues</h3>
             <button className="text-primary font-label-md hover:underline">View Full Map</button>
@@ -35,10 +52,10 @@ export default function Dashboard({ onViewIssue }) {
               3 Active Alerts
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Leaderboard Card (4 columns on desktop) */}
-        <section className="md:col-span-4 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-4 space-y-3">
           <h3 className="font-title-md">Civic Standing</h3>
           <div className="glass-card rounded-xl p-6 h-full flex flex-col justify-center items-center text-center space-y-4 shadow-xl">
             <div className="w-20 h-20 bg-primary-container/80 text-on-primary-container rounded-full flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
@@ -53,10 +70,10 @@ export default function Dashboard({ onViewIssue }) {
             </div>
             <p className="text-label-md text-on-surface-variant">120 points until Silver Tier</p>
           </div>
-        </section>
+        </motion.section>
 
         {/* Progress Charts Section */}
-        <section className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="glass-card rounded-xl p-6 flex items-center gap-6 shadow-xl">
             <div className="relative w-24 h-24 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90">
@@ -86,13 +103,13 @@ export default function Dashboard({ onViewIssue }) {
         </section>
 
         {/* Recent Reports */}
-        <section className="md:col-span-12 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-12 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-title-md">Your Recent Reports</h3>
             <button className="text-primary font-label-md">See All</button>
           </div>
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-            <div className="min-w-[280px] glass-card rounded-xl p-4 shadow-xl flex flex-col justify-between cursor-pointer" onClick={() => onViewIssue('1')}>
+            <motion.div whileHover={{ scale: 1.02 }} className="min-w-[280px] glass-card rounded-xl p-4 shadow-xl flex flex-col justify-between cursor-pointer" onClick={() => onViewIssue('1')}>
               <div className="flex justify-between items-start mb-3">
                 <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-primary/20">ID: #4029</span>
                 <span className="text-xs text-on-surface-variant">2h ago</span>
@@ -103,8 +120,8 @@ export default function Dashboard({ onViewIssue }) {
                 <span className="w-2.5 h-2.5 bg-primary rounded-full shadow-[0_0_8px_rgba(180,197,255,0.6)]"></span>
                 <span className="text-xs font-semibold text-primary">Verifying</span>
               </div>
-            </div>
-            <div className="min-w-[280px] glass-card rounded-xl p-4 shadow-xl flex flex-col justify-between">
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} className="min-w-[280px] glass-card rounded-xl p-4 shadow-xl flex flex-col justify-between">
               <div className="flex justify-between items-start mb-3">
                 <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-primary/20">ID: #3981</span>
                 <span className="text-xs text-on-surface-variant">Yesterday</span>
@@ -115,12 +132,12 @@ export default function Dashboard({ onViewIssue }) {
                 <span className="w-2.5 h-2.5 bg-secondary rounded-full shadow-[0_0_8px_rgba(78,222,163,0.6)]"></span>
                 <span className="text-xs font-semibold text-secondary">Resolved</span>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Notifications */}
-        <section className="md:col-span-12 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-12 space-y-3">
           <h3 className="font-title-md">Alerts & Notifications</h3>
           <div className="space-y-2">
             <div className="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl border border-outline-variant/20 shadow-sm">
@@ -134,8 +151,8 @@ export default function Dashboard({ onViewIssue }) {
               <span className="text-xs text-outline shrink-0">10m ago</span>
             </div>
           </div>
-        </section>
-      </div>
+        </motion.section>
+      </motion.div>
     </>
   );
 }

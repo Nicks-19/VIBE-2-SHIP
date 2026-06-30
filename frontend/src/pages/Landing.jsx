@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Landing = () => {
   useEffect(() => {
@@ -57,19 +58,44 @@ const Landing = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background z-10"></div>
             <img alt="Futuristic city background" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlw5HTdD9w21Oi1HQ-h6l1pWeiZBQhkT0xvjR1Ic5qjITZ6CxIU31iyV4QVgzRbT1Ctmk9sKThA587GsRyUScLFz5gTe77eLKflJqTXhcbVSInvwI3eJXCGR538_xrxh5nHowLV9d0Jy-xtSBZWsWobkrJq31ad8XVVN5BrvXPQR2hBDiz-Rk1bP2EePZBaB7vUzhjWzP0u6CgttLKzhaCuUyP3WEjDXc38b_DnrF45WZT_v5-FfNHgTdh-a3wMIx8Q1vgmQjt7DIo" />
           </div>
-          <div className="max-w-4xl space-y-6 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary mb-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="max-w-4xl space-y-6 relative z-10"
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary mb-4"
+            >
               <span className="material-symbols-outlined text-[16px]" data-icon="verified">verified</span>
               <span className="font-mono-label text-mono-label uppercase">Operating System for Governance</span>
-            </div>
-            <h1 className="font-display-lg text-display-lg md:text-[64px] md:leading-[1.1] text-on-surface tracking-tight">
+            </motion.div>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="font-display-lg text-display-lg md:text-[64px] md:leading-[1.1] text-on-surface tracking-tight"
+            >
               Every citizen becomes a sensor. <br className="hidden md:block" />
               <span className="text-gradient">AI becomes the city manager.</span>
-            </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto"
+            >
               Real-time civic intelligence infrastructure. Automated reporting, predictive maintenance, and seamless citizen-to-state transparency powered by next-gen LLMs.
-            </p>
-            <div className="pt-8 flex flex-col md:flex-row gap-4 justify-center">
+            </motion.p>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="pt-8 flex flex-col md:flex-row gap-4 justify-center"
+            >
               <Link to="/app" className="glass-card p-4 rounded-3xl flex flex-col md:flex-row items-center gap-4 transition-all hover:shadow-2xl hover:shadow-primary/20 group cursor-pointer border-white/5">
                 <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-on-primary group-hover:scale-110 transition-transform">
                   <span className="material-symbols-outlined" data-icon="campaign" style={{ fontVariationSettings: "'FILL' 1" }}>campaign</span>
@@ -85,8 +111,8 @@ const Landing = () => {
               <button className="px-8 py-4 rounded-3xl border border-outline-variant/50 font-title-md text-title-md text-on-surface hover:bg-surface-container transition-colors">
                 View Live Map
               </button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           {/* Dashboard Preview */}
           <div className="mt-20 w-full max-w-5xl relative">
             <div className="glass-card rounded-t-[40px] p-2 pb-0 overflow-hidden shadow-2xl border-b-0 border-white/10">
