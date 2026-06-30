@@ -1,225 +1,141 @@
-import React, { useState, useEffect } from 'react';
-import { fetchStats, fetchIssues, updateIssueStatus } from '../services/ApiService';
-import {
-  AlertTriangle, CheckCircle2, Clock, Loader2, TrendingUp, BarChart3,
-  ChevronRight, ArrowUpRight, ArrowDownRight, Building2, Zap,
-  CircleDot, Activity,
-} from 'lucide-react';
-
-const STATUS_STYLES = {
-  'Submitted': 'badge-open',
-  'Verified': 'badge-medium',
-  'In Progress': 'badge-in-progress',
-  'Resolved': 'badge-resolved',
-  'Rejected': 'badge-rejected',
-};
-
-function AnimatedCounter({ value, duration = 1000 }) {
-  const [display, setDisplay] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const step = value / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= value) {
-        setDisplay(value);
-        clearInterval(timer);
-      } else {
-        setDisplay(Math.floor(start));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [value, duration]);
-  return <>{typeof value === 'number' && value % 1 !== 0 ? display.toFixed(1) : display}</>;
-}
+import React from 'react';
 
 export default function Dashboard({ onViewIssue }) {
-  const [stats, setStats] = useState(null);
-  const [issues, setIssues] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    setLoading(true);
-    const [s, i] = await Promise.all([fetchStats(), fetchIssues()]);
-    setStats(s);
-    setIssues(i);
-    setLoading(false);
-  }
-
-  async function handleStatusChange(issueId, newStatus) {
-    await updateIssueStatus(issueId, newStatus, `Status changed to ${newStatus} by authority`);
-    loadData();
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-civic-400 animate-spin" />
-      </div>
-    );
-  }
-
-  const statusBreakdown = stats?.statusBreakdown || {};
-  const categoryBreakdown = stats?.categoryBreakdown || {};
-  const maxCategoryCount = Math.max(...Object.values(categoryBreakdown), 1);
-
   return (
-    <div className="max-w-6xl mx-auto animate-fade-in space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <>
+      {/* Header & Weather Widget */}
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white">Command Center</h2>
-          <p className="text-sm text-slate-400">Municipal issue management dashboard</p>
+          <p className="text-on-surface-variant font-label-md uppercase tracking-wider mb-1">Thursday, Oct 24</p>
+          <h2 className="font-headline-lg-mobile text-on-background">Good morning, Citizen</h2>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-civic-500/10 border border-civic-500/20">
-          <Activity className="w-3.5 h-3.5 text-civic-400" />
-          <span className="text-xs font-medium text-civic-400">Live Data</span>
+        <div className="glass-card rounded-xl p-4 flex items-center gap-4 shadow-xl">
+          <div className="bg-secondary-container/50 text-secondary p-2 rounded-lg">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>sunny</span>
+          </div>
+          <div>
+            <div className="font-title-md text-on-surface">72°F <span className="text-on-surface-variant font-normal text-sm">Downtown</span></div>
+            <div className="text-label-md text-secondary font-semibold">Air Quality: Good (24 AQI)</div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
-        <div className="stat-card stat-card-indigo glass rounded-xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-slate-400">Total Issues</span>
-            <BarChart3 className="w-4 h-4 text-civic-400" />
+      {/* Bento Grid Main Content */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Map Snippet Card (8 columns on desktop) */}
+        <section className="md:col-span-8 space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="font-title-md">Nearby Issues</h3>
+            <button className="text-primary font-label-md hover:underline">View Full Map</button>
           </div>
-          <p className="text-3xl font-bold text-white"><AnimatedCounter value={stats?.totalIssues || 0} /></p>
-          <div className="flex items-center gap-1 mt-1.5 text-xs text-emerald-400">
-            <ArrowUpRight className="w-3 h-3" /> +3 this week
-          </div>
-        </div>
-
-        <div className="stat-card stat-card-amber glass rounded-xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-slate-400">Open / In Progress</span>
-            <Clock className="w-4 h-4 text-amber-400" />
-          </div>
-          <p className="text-3xl font-bold text-white">
-            <AnimatedCounter value={(statusBreakdown['Submitted'] || 0) + (statusBreakdown['In Progress'] || 0)} />
-          </p>
-          <div className="flex items-center gap-1 mt-1.5 text-xs text-amber-400">
-            <AlertTriangle className="w-3 h-3" /> Requires attention
-          </div>
-        </div>
-
-        <div className="stat-card stat-card-emerald glass rounded-xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-slate-400">Resolved</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          </div>
-          <p className="text-3xl font-bold text-white"><AnimatedCounter value={statusBreakdown['Resolved'] || 0} /></p>
-          <div className="flex items-center gap-1 mt-1.5 text-xs text-emerald-400">
-            <ArrowUpRight className="w-3 h-3" /> {stats?.resolvedRate || 0}% resolution rate
-          </div>
-        </div>
-
-        <div className="stat-card stat-card-rose glass rounded-xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-slate-400">Avg Priority</span>
-            <TrendingUp className="w-4 h-4 text-rose-400" />
-          </div>
-          <p className="text-3xl font-bold text-white"><AnimatedCounter value={stats?.avgPriority || 0} /></p>
-          <div className="flex items-center gap-1 mt-1.5 text-xs text-rose-400">
-            <Zap className="w-3 h-3" /> Severity avg: {stats?.avgSeverity || 0}
-          </div>
-        </div>
-      </div>
-
-      {/* Category Breakdown + Recent Issues */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Category Chart */}
-        <div className="glass rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <CircleDot className="w-4 h-4 text-civic-400" /> Category Distribution
-          </h3>
-          <div className="space-y-3">
-            {Object.entries(categoryBreakdown).map(([cat, count]) => (
-              <div key={cat}>
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-slate-300">{cat}</span>
-                  <span className="text-slate-500">{count}</span>
-                </div>
-                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-civic-600 to-civic-400 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${(count / maxCategoryCount) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent Issues */}
-        <div className="lg:col-span-2 glass rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400" /> Active Issues
-          </h3>
-          <div className="space-y-2">
-            {issues.filter(i => i.status !== 'Resolved').slice(0, 6).map(issue => (
-              <div
-                key={issue.id}
-                className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800/60 transition-colors cursor-pointer group"
-                onClick={() => onViewIssue(issue.id)}
-              >
-                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                  issue.severity >= 4 ? 'bg-rose-400' : issue.severity >= 3 ? 'bg-amber-400' : 'bg-blue-400'
-                }`} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white truncate">{issue.title}</p>
-                  <p className="text-xs text-slate-500">{issue.department} • {issue.reporterName}</p>
-                </div>
-                <span className={`badge ${STATUS_STYLES[issue.status] || ''}`}>{issue.status}</span>
-                <div className="text-right flex-shrink-0 w-12">
-                  <p className="text-sm font-bold text-white">{issue.priorityScore}</p>
-                </div>
-                {/* Quick actions for authority */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {issue.status === 'Submitted' && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleStatusChange(issue.id, 'In Progress'); }}
-                      className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs"
-                      title="Start Progress"
-                    >
-                      <Clock className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                  {(issue.status === 'Submitted' || issue.status === 'In Progress') && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleStatusChange(issue.id, 'Resolved'); }}
-                      className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs"
-                      title="Mark Resolved"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-civic-400 transition-colors flex-shrink-0" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Department Breakdown */}
-      <div className="glass rounded-xl p-6">
-        <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-          <Building2 className="w-4 h-4 text-civic-400" /> Department Load
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {Object.entries(stats?.departmentBreakdown || {}).map(([dept, count]) => (
-            <div key={dept} className="p-4 rounded-xl bg-slate-800/40 text-center hover:bg-slate-800/60 transition-colors">
-              <p className="text-2xl font-bold text-white mb-1">{count}</p>
-              <p className="text-xs text-slate-400 leading-tight">{dept}</p>
+          <div className="relative h-64 md:h-80 rounded-xl overflow-hidden shadow-2xl border border-outline-variant/30">
+            <div className="absolute inset-0 bg-cover bg-center brightness-75" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCcehhVisnczYayW4UtNleKcOOTvIiAoy8Fb9ygzmNOuDpsstSkudahETjBNY0gWba7CE-0K8iu72dWRjUOSzp1vOy2XCsRGnT0CE4OhYNzvi9lVcA32UpYuak0Nr-kHwCRkpjoH_OHo_lG8eYQTanrHXOgIOvWNwga2rPUmGODIGqWwkLN4xL8P97Gge9zACeE84ROJw0B3VuJFOG-15w-laujX0JM8k3yCGlByDdD13qvaRHcXYE92_N4_2TkKyPggjnEq6WTGQPX')" }}></div>
+            <div className="absolute top-4 left-4 glass-card px-3 py-1 rounded-full text-xs font-semibold text-primary flex items-center gap-2 border-primary/20">
+              <span className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(180,197,255,0.8)]"></span>
+              3 Active Alerts
             </div>
-          ))}
-        </div>
+          </div>
+        </section>
+
+        {/* Leaderboard Card (4 columns on desktop) */}
+        <section className="md:col-span-4 space-y-3">
+          <h3 className="font-title-md">Civic Standing</h3>
+          <div className="glass-card rounded-xl p-6 h-full flex flex-col justify-center items-center text-center space-y-4 shadow-xl">
+            <div className="w-20 h-20 bg-primary-container/80 text-on-primary-container rounded-full flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+              <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+            </div>
+            <div>
+              <div className="text-primary font-display-sm">Rank #12</div>
+              <div className="text-on-surface-variant font-body-md">in Downtown District</div>
+            </div>
+            <div className="w-full bg-surface-container rounded-full h-2.5 mt-4">
+              <div className="bg-primary h-2.5 rounded-full shadow-[0_0_8px_rgba(180,197,255,0.5)]" style={{ width: '85%' }}></div>
+            </div>
+            <p className="text-label-md text-on-surface-variant">120 points until Silver Tier</p>
+          </div>
+        </section>
+
+        {/* Progress Charts Section */}
+        <section className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="glass-card rounded-xl p-6 flex items-center gap-6 shadow-xl">
+            <div className="relative w-24 h-24 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90">
+                <circle className="text-surface-container" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeWidth="8"></circle>
+                <circle className="text-primary transition-all duration-1000" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeDasharray="251.2" strokeDashoffset="37.6" strokeLinecap="round" strokeWidth="8"></circle>
+              </svg>
+              <span className="absolute font-title-md text-primary">85%</span>
+            </div>
+            <div>
+              <h4 className="font-title-md text-on-surface">City Health Score</h4>
+              <p className="text-body-md text-on-surface-variant mt-1 leading-tight">Infrastructure and utility uptime is currently optimal across 14 sectors.</p>
+            </div>
+          </div>
+          <div className="glass-card rounded-xl p-6 flex items-center gap-6 shadow-xl">
+            <div className="relative w-24 h-24 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90">
+                <circle className="text-surface-container" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeWidth="8"></circle>
+                <circle className="text-secondary transition-all duration-1000" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeDasharray="251.2" strokeDashoffset="20.1" strokeLinecap="round" strokeWidth="8"></circle>
+              </svg>
+              <span className="absolute font-title-md text-secondary">92%</span>
+            </div>
+            <div>
+              <h4 className="font-title-md text-on-surface">Citizen Trust Score</h4>
+              <p className="text-body-md text-on-surface-variant mt-1 leading-tight">Response times for reports are 15% faster than last month.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Recent Reports */}
+        <section className="md:col-span-12 space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="font-title-md">Your Recent Reports</h3>
+            <button className="text-primary font-label-md">See All</button>
+          </div>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            <div className="min-w-[280px] glass-card rounded-xl p-4 shadow-xl flex flex-col justify-between cursor-pointer" onClick={() => onViewIssue('1')}>
+              <div className="flex justify-between items-start mb-3">
+                <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-primary/20">ID: #4029</span>
+                <span className="text-xs text-on-surface-variant">2h ago</span>
+              </div>
+              <h5 className="font-semibold mb-1 text-on-surface">Broken Street Light</h5>
+              <p className="text-xs text-on-surface-variant mb-4">4th & Madison Ave Intersection</p>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-primary rounded-full shadow-[0_0_8px_rgba(180,197,255,0.6)]"></span>
+                <span className="text-xs font-semibold text-primary">Verifying</span>
+              </div>
+            </div>
+            <div className="min-w-[280px] glass-card rounded-xl p-4 shadow-xl flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-3">
+                <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-primary/20">ID: #3981</span>
+                <span className="text-xs text-on-surface-variant">Yesterday</span>
+              </div>
+              <h5 className="font-semibold mb-1 text-on-surface">Illegal Dumping</h5>
+              <p className="text-xs text-on-surface-variant mb-4">Back alley of 5th Ave Mall</p>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-secondary rounded-full shadow-[0_0_8px_rgba(78,222,163,0.6)]"></span>
+                <span className="text-xs font-semibold text-secondary">Resolved</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Notifications */}
+        <section className="md:col-span-12 space-y-3">
+          <h3 className="font-title-md">Alerts & Notifications</h3>
+          <div className="space-y-2">
+            <div className="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl border border-outline-variant/20 shadow-sm">
+              <div className="bg-primary-container/30 p-2 rounded-lg text-primary shrink-0">
+                <span className="material-symbols-outlined text-lg">info</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-body-md font-semibold text-on-surface leading-tight">Water Main Repair scheduled for tomorrow at 9 AM.</p>
+                <p className="text-xs text-on-surface-variant">Your building may experience low pressure.</p>
+              </div>
+              <span className="text-xs text-outline shrink-0">10m ago</span>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </>
   );
 }

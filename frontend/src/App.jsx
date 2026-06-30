@@ -7,36 +7,15 @@ import Dashboard from './pages/Dashboard';
 import IssueDetail from './pages/IssueDetail';
 import MapView from './pages/MapView';
 import Leaderboard from './pages/Leaderboard';
-import {
-  LogOut, Menu, X, PlusCircle, List, LayoutDashboard,
-  Map, Trophy, ChevronRight, Zap, Shield,
-} from 'lucide-react';
 
 function App() {
   const { user, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState(null);
   const [selectedIssueId, setSelectedIssueId] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (!user) return <Login />;
 
-  // Set default page based on role
-  const activePage = currentPage || (user.role === 'citizen' ? 'report' : 'dashboard');
-
-  const citizenNav = [
-    { id: 'report', label: 'Report Issue', icon: PlusCircle },
-    { id: 'my-issues', label: 'My Issues', icon: List },
-    { id: 'map', label: 'City Map', icon: Map },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
-  ];
-
-  const authorityNav = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'map', label: 'City Map', icon: Map },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
-  ];
-
-  const navItems = user.role === 'citizen' ? citizenNav : authorityNav;
+  const activePage = currentPage || (user.role === 'citizen' ? 'dashboard' : 'dashboard');
 
   function handleViewIssue(issueId) {
     setSelectedIssueId(issueId);
@@ -45,7 +24,7 @@ function App() {
 
   function handleBack() {
     setSelectedIssueId(null);
-    setCurrentPage(user.role === 'citizen' ? 'my-issues' : 'dashboard');
+    setCurrentPage('dashboard');
   }
 
   function renderPage() {
@@ -63,105 +42,60 @@ function App() {
       case 'leaderboard':
         return <Leaderboard currentUserId={user.uid} />;
       default:
-        return <ReportIssue onSuccess={() => setCurrentPage('my-issues')} />;
+        return <Dashboard onViewIssue={handleViewIssue} />;
     }
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 bg-grid flex">
-      {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 flex flex-col transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/60`}
-      >
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-800/60">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-civic-500 to-civic-700 flex items-center justify-center shadow-lg shadow-civic-600/20">
-            <Shield className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-base font-bold text-white tracking-tight">CivicAlpha</h1>
-            <span className="text-[10px] font-semibold text-civic-400 tracking-widest uppercase">AI Platform</span>
-          </div>
+    <div className="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen pb-24">
+      {/* Top AppBar */}
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30">
+        <div className="flex items-center gap-3">
+          <button className="material-symbols-outlined text-primary hover:bg-primary/10 transition-colors p-2 rounded-full">grid_view</button>
+          <h1 className="font-display-sm text-headline-lg-mobile tracking-tighter text-primary">CivicPulse AI</h1>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activePage === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => { setCurrentPage(item.id); setSelectedIssueId(null); }}
-                className={`nav-item w-full group ${isActive ? 'active' : ''}`}
-              >
-                <Icon className={`w-[18px] h-[18px] transition-colors ${isActive ? 'text-civic-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                <span className="flex-1 text-left">{item.label}</span>
-                {isActive && <ChevronRight className="w-4 h-4 text-civic-400" />}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* User Profile */}
-        <div className="px-3 py-4 border-t border-slate-800/60">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-civic-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
-              {user.name?.charAt(0) || 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user.name}</p>
-              <div className="flex items-center gap-1.5">
-                <span className={`inline-block w-1.5 h-1.5 rounded-full ${user.role === 'citizen' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                <span className="text-[11px] text-slate-500 capitalize">{user.role}</span>
-                {user.role === 'citizen' && (
-                  <span className="flex items-center gap-0.5 text-[11px] text-amber-400 font-semibold ml-1">
-                    <Zap className="w-3 h-3" />{user.xp} XP
-                  </span>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={logout}
-              className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-all"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+          <button className="material-symbols-outlined text-primary hover:bg-primary/10 transition-colors p-2 rounded-full">smart_toy</button>
+          <button onClick={logout} className="material-symbols-outlined text-error hover:bg-error/10 transition-colors p-2 rounded-full text-sm">logout</button>
         </div>
-      </aside>
+      </header>
 
-      {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
-        {/* Top bar */}
-        <header className="sticky top-0 z-30 flex items-center gap-4 px-6 py-3 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800/40">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-all"
-          >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-          <div className="flex-1">
-            <h2 className="text-sm font-semibold text-white">
-              {navItems.find(n => n.id === activePage)?.label || 'Issue Detail'}
-            </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-soft" />
-              System Online
-            </span>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <div className="p-6 page-enter">
-          {renderPage()}
-        </div>
+      <main className="pt-20 px-margin-mobile max-w-container-max mx-auto space-y-6">
+        {renderPage()}
       </main>
+
+      {/* FAB */}
+      <button 
+        onClick={() => setCurrentPage('report')}
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-[0_8px_32px_rgba(37,99,235,0.5)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 group"
+      >
+        <span className="material-symbols-outlined text-3xl">add</span>
+        <span className="absolute right-16 bg-surface-container-highest text-on-surface text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl border border-outline-variant/30">Quick Report</span>
+      </button>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/20 shadow-2xl rounded-t-xl md:hidden">
+        <button onClick={() => setCurrentPage('dashboard')} className={`flex flex-col items-center justify-center rounded-xl px-3 py-1 scale-90 border transition-all ${activePage === 'dashboard' ? 'bg-primary-container/40 text-primary border-primary/20' : 'text-on-surface-variant border-transparent'}`}>
+          <span className="material-symbols-outlined" style={{ fontVariationSettings: activePage === 'dashboard' ? "'FILL' 1" : "'FILL' 0" }}>home</span>
+          <span className="font-label-md text-label-md">Home</span>
+        </button>
+        <button onClick={() => setCurrentPage('map')} className={`flex flex-col items-center justify-center transition-all ${activePage === 'map' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>
+          <span className="material-symbols-outlined">map</span>
+          <span className="font-label-md text-label-md">Map</span>
+        </button>
+        <button onClick={() => setCurrentPage('report')} className={`flex flex-col items-center justify-center transition-all ${activePage === 'report' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>
+          <span className="material-symbols-outlined">add_circle</span>
+          <span className="font-label-md text-label-md">Report</span>
+        </button>
+        <button onClick={() => setCurrentPage('my-issues')} className={`flex flex-col items-center justify-center transition-all ${activePage === 'my-issues' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>
+          <span className="material-symbols-outlined">list</span>
+          <span className="font-label-md text-label-md">Issues</span>
+        </button>
+        <button onClick={() => setCurrentPage('leaderboard')} className={`flex flex-col items-center justify-center transition-all ${activePage === 'leaderboard' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}`}>
+          <span className="material-symbols-outlined">trophy</span>
+          <span className="font-label-md text-label-md">Rank</span>
+        </button>
+      </nav>
     </div>
   );
 }
