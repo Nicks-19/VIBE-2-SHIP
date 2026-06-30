@@ -3,7 +3,10 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status, File, UploadFile
+import os
+import json
+import tempfile
 
 from app.core.db import store
 from app.core.ai_engine import analyze_issue
@@ -12,6 +15,102 @@ from app.schemas.issues import IssueCreate, IssueResponse
 router = APIRouter()
 
 COLLECTION = "issues"
+
+@router.post("/voice", response_model=dict, status_code=status.HTTP_201_CREATED)
+async def create_issue_from_voice(
+    file: UploadFile = File(...),
+    latitude: Optional[float] = Query(0.0),
+    longitude: Optional[float] = Query(0.0)
+):
+    """Transcribe voice and create a new civic issue."""
+    import google.generativeai as genai
+    from app.core.ai_engine import _configure_gemini, _get_department, _calculate_priority, VALID_CATEGORIES
+    
+    gemini_ready = _configure_gemini()
+    if not gemini_ready:
+        raise HTTPException(status_code=500, detail="Gemini API not configured")
+        
+    try:
+        ext = file.filename.split(".")[-1] if "." in file.filename else "webm"
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp:
+            tmp.write(await file.read())
+            tmp_path = tmp.name
+            
+        audio_file = genai.upload_file(path=tmp_path)
+        
+        prompt = f"""You are a municipal issue classifier. Listen to this audio report and return a JSON object with exactly these fields:
+- "transcription": The exact transcription of what the citizen said.
+- "title": A concise 3-5 word title for the issue.
+- "category": One of: {json.dumps(VALID_CATEGORIES)}
+- "severity": Integer 1-5 (1=cosmetic, 5=critical)
+- "confidence": Float 0.0-1.0 representing your confidence
+- "keywords": Array of 3-6 relevant keywords
+
+Respond ONLY with valid JSON, no markdown formatting."""
+
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content([prompt, audio_file])
+        text = response.text.strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1]
+            if text.endswith("```"):
+                text = text[:-3]
+            text = text.strip()
+            
+        result = json.loads(text)
+        
+        os.unlink(tmp_path)
+        genai.delete_file(audio_file.name)
+        
+        category = result.get("category", "General")
+        severity = max(1, min(5, int(result.get("severity", 3))))
+        description = result.get("transcription", "")
+        
+        priority_score, priority_reasons = _calculate_priority(severity, category, description)
+        
+        now = datetime.now(timezone.utc)
+        issue_data = {
+            "title": result.get("title", category + " Report"),
+            "description": description,
+            "imageUrl": None,
+            "location": {
+                "latitude": latitude,
+                "longitude": longitude,
+                "address": None,
+            },
+            "aiAnalysis": {
+                "category": category,
+                "visionConfidence": float(result.get("confidence", 0.85)),
+                "extractedKeywords": result.get("keywords", []),
+                "voiceTranscribed": True
+            },
+            "severity": severity,
+            "priorityScore": priority_score,
+            "priorityReasons": priority_reasons,
+            "department": _get_department(category),
+            "status": "Submitted",
+            "timeline": [
+                {
+                    "status": "Submitted",
+                    "timestamp": now.isoformat(),
+                    "note": "Issue reported via Voice AI",
+                }
+            ],
+            "reporterId": "usr_citizen_77",
+            "reporterName": "Jane Doe",
+            "duplicateId": None,
+            "verificationCount": 1,
+            "upvotes": 0,
+            "createdTime": now.isoformat(),
+            "updatedTime": now.isoformat(),
+        }
+        
+        saved = store.create(COLLECTION, issue_data)
+        return saved
+        
+    except Exception as e:
+        print(f"Voice AI Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/", response_model=dict, status_code=status.HTTP_201_CREATED)

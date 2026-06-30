@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function Dashboard({ onViewIssue }) {
+  const [audit, setAudit] = useState(null);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/audit/latest')
+      .then(res => res.json())
+      .then(data => setAudit(data))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <>
       {/* Header & Weather Widget */}
@@ -150,6 +159,42 @@ export default function Dashboard({ onViewIssue }) {
               </div>
               <span className="text-xs text-outline shrink-0">10m ago</span>
             </div>
+          </div>
+        </motion.section>
+
+        {/* Accessibility Audit Widget */}
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.5, duration: 0.8 } } }} className="md:col-span-12 space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="font-title-md">Accessibility Audit</h3>
+            <button className="text-primary font-label-md">Run Audit</button>
+          </div>
+          <div className="glass-card rounded-xl p-6 shadow-xl border-l-4 border-l-primary">
+            {audit ? (
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex flex-col items-center justify-center shrink-0">
+                  <div className={`text-4xl font-display-lg ${audit.score >= 90 ? 'text-emerald-400' : audit.score >= 70 ? 'text-amber-400' : 'text-rose-400'}`}>
+                    {audit.score}
+                  </div>
+                  <div className="text-label-md text-on-surface-variant uppercase tracking-widest mt-1">WCAG Score</div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-title-md text-on-surface mb-2">AI Fix Suggestions</h4>
+                  {audit.suggestions && audit.suggestions.length > 0 ? (
+                    <ul className="space-y-1">
+                      {audit.suggestions.map((sug, i) => (
+                        <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                          <span className="text-primary">•</span> {sug}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-slate-400">All good! No suggestions at this time.</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-slate-400 animate-pulse">Loading audit data...</div>
+            )}
           </div>
         </motion.section>
       </motion.div>

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf node_modules && npm install && vite build"
+    "build": "rm -rf node_modules && npm install && vite build",
+    "audit": "node scripts/audit.js"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
@@ -19,6 +20,8 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
+    "chrome-launcher": "^1.2.1",
+    "lighthouse": "^13.4.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "vite": "^5.3.1"

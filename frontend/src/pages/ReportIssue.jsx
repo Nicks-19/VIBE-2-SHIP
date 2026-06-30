@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { createIssue } from '../services/ApiService';
 import {
   Camera, Upload, MapPin, Loader2, CheckCircle2, Sparkles,
-  ArrowRight, AlertTriangle, FileText, X,
+  ArrowRight, AlertTriangle, FileText, X, Mic, Square
 } from 'lucide-react';
 
 export default function ReportIssue({ onSuccess }) {
@@ -15,6 +15,68 @@ export default function ReportIssue({ onSuccess }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+      
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+      
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        await processVoiceIssue(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+    } catch (err) {
+      setError('Microphone access denied or unavailable.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const processVoiceIssue = async (audioBlob) => {
+    setIsProcessingVoice(true);
+    setStep(3); // Analyzing
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'voice.webm');
+      if (location) {
+        formData.append('latitude', location.latitude);
+        formData.append('longitude', location.longitude);
+      }
+      
+      const res = await fetch('http://localhost:8000/api/issues/voice', {
+        method: 'POST',
+        body: formData
+      });
+      if (!res.ok) throw new Error('Voice analysis failed');
+      const data = await res.json();
+      setResult(data);
+      setStep(4);
+    } catch (err) {
+      setError('Voice analysis failed. Please try again.');
+      setStep(1);
+    } finally {
+      setIsProcessingVoice(false);
+    }
+  };
 
   function handleImageSelect(e) {
     const file = e.target.files?.[0];
@@ -88,23 +150,34 @@ export default function ReportIssue({ onSuccess }) {
 
         <div className="glass rounded-2xl p-8">
           {!imagePreview ? (
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-600 hover:border-civic-500/50 rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 hover:bg-civic-500/5 group"
-            >
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center mb-4 group-hover:bg-civic-500/10 transition-colors">
-                <Camera className="w-8 h-8 text-slate-400 group-hover:text-civic-400 transition-colors" />
+            <div className="space-y-4">
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-600 hover:border-civic-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 hover:bg-civic-500/5 group"
+              >
+                <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center mb-4 group-hover:bg-civic-500/10 transition-colors">
+                  <Camera className="w-6 h-6 text-slate-400 group-hover:text-civic-400 transition-colors" />
+                </div>
+                <p className="text-white font-semibold mb-1">Click to upload photo</p>
+                <p className="text-slate-500 text-sm">or drag and drop • JPG, PNG</p>
               </div>
-              <p className="text-white font-semibold mb-1">Click to upload photo</p>
-              <p className="text-slate-500 text-sm">or drag and drop • JPG, PNG up to 10MB</p>
-              <div className="flex items-center justify-center gap-4 mt-6">
-                <span className="flex items-center gap-2 text-xs text-slate-500">
-                  <Upload className="w-3.5 h-3.5" /> Upload File
-                </span>
-                <span className="text-slate-700">|</span>
-                <span className="flex items-center gap-2 text-xs text-slate-500">
-                  <Camera className="w-3.5 h-3.5" /> Take Photo
-                </span>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-slate-700"></div>
+                <span className="flex-shrink-0 mx-4 text-slate-500 text-sm">OR</span>
+                <div className="flex-grow border-t border-slate-700"></div>
+              </div>
+
+              <div
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`border-2 border-slate-700 rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 ${isRecording ? 'bg-rose-500/10 border-rose-500/50' : 'hover:border-civic-500/50 hover:bg-civic-500/5'}`}
+              >
+                <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3 ${isRecording ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-800 text-slate-400'}`}>
+                  {isRecording ? <Square className="w-5 h-5 fill-current" /> : <Mic className="w-6 h-6" />}
+                </div>
+                <p className={`font-semibold ${isRecording ? 'text-rose-400' : 'text-white'}`}>
+                  {isRecording ? 'Recording... Click to Stop & Analyze' : 'Record Voice Note'}
+                </p>
               </div>
             </div>
           ) : (
@@ -245,7 +318,7 @@ export default function ReportIssue({ onSuccess }) {
           <Sparkles className="w-10 h-10 text-civic-400" />
         </div>
         <h2 className="text-xl font-bold text-white mb-2">AI is Analyzing Your Report</h2>
-        <p className="text-slate-400 text-sm mb-8">Classifying issue, scoring severity, routing to department...</p>
+        <p className="text-slate-400 text-sm mb-8">{isProcessingVoice ? 'Transcribing voice, classifying issue, scoring severity...' : 'Classifying issue, scoring severity, routing to department...'}</p>
         
         <div className="space-y-3 max-w-xs mx-auto">
           {['Image Classification', 'Severity Assessment', 'Department Routing', 'Priority Scoring'].map((label, i) => (
