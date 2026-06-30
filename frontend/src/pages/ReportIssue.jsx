@@ -55,7 +55,7 @@ export default function ReportIssue({ onSuccess }) {
     try {
       const payload = {
         title: title || undefined,
-        description: description || 'Civic infrastructure issue reported via CivicPulse AI',
+        description: description || 'Civic infrastructure issue reported via CivicAlpha AI',
         imageUrl: imagePreview || '',
         latitude: location.latitude,
         longitude: location.longitude,

@@ -1,10 +1,10 @@
-# CivicPulse AI - Project Description
+# CivicAlpha AI - Project Description
 
 ## 1. Problem Statement
 Urban infrastructure maintenance is often reactive, slow, and opaque. Citizens struggle to report issues like potholes, broken streetlights, or waste overflow efficiently, and municipal authorities lack prioritized, data-driven insights to manage these issues effectively.
 
 ## 2. Solution Overview
-CivicPulse AI is a smart city infrastructure platform that bridges the gap between citizens and municipal authorities. It leverages Google Gemini AI to automatically classify, prioritize, and route infrastructure issues reported by citizens. 
+CivicAlpha AI is a smart city infrastructure platform that bridges the gap between citizens and municipal authorities. It leverages Google Gemini AI to automatically classify, prioritize, and route infrastructure issues reported by citizens. 
 
 ## 3. Key Features
 - **AI-Powered Issue Reporting:** Citizens can capture photos of infrastructure issues. The AI automatically classifies the issue (e.g., Road Damage, Waste Management), extracts keywords, and assigns a severity and priority score.
@@ -19,4 +19,4 @@ CivicPulse AI is a smart city infrastructure platform that bridges the gap betwe
 - **AI Integration:** Google Gemini AI (simulated in demo mode).
 
 ## 5. Hackathon Impact
-CivicPulse AI directly addresses smart city management by streamlining the issue resolution lifecycle. By automating the triage process with AI, it saves municipal hours, increases transparency for citizens, and ultimately leads to safer, better-maintained urban environments.
+CivicAlpha AI directly addresses smart city management by streamlining the issue resolution lifecycle. By automating the triage process with AI, it saves municipal hours, increases transparency for citizens, and ultimately leads to safer, better-maintained urban environments.

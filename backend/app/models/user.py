@@ -1,4 +1,4 @@
-"""User model for the CivicPulse AI application."""
+"""User model for the CivicAlpha AI application."""
 
 from typing import Optional
 from datetime import datetime

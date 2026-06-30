@@ -81,7 +81,7 @@ function App() {
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-white tracking-tight">CivicPulse</h1>
+            <h1 className="text-base font-bold text-white tracking-tight">CivicAlpha</h1>
             <span className="text-[10px] font-semibold text-civic-400 tracking-widest uppercase">AI Platform</span>
           </div>
         </div>

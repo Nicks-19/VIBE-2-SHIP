@@ -1,5 +1,5 @@
 /**
- * CivicPulse API Service
+ * CivicAlpha API Service
  * 
  * Centralized API client with automatic fallback to mock data
  * when backend is unreachable. Ensures the demo always works.

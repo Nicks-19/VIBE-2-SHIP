@@ -29,7 +29,7 @@ export default function Login() {
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-4xl font-black text-white tracking-tight mb-1">
-            CivicPulse <span className="bg-gradient-to-r from-civic-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+            CivicAlpha <span className="bg-gradient-to-r from-civic-400 to-purple-400 bg-clip-text text-transparent">AI</span>
           </h1>
           <p className="text-slate-400 text-sm mt-2 max-w-xs mx-auto leading-relaxed">
             AI-powered civic infrastructure reporting for smarter cities
