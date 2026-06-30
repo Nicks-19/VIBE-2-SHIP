@@ -71,8 +71,8 @@ function App() {
     <div className="min-h-screen bg-slate-950 bg-grid flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex flex-col transition-all duration-300 ease-in-out
-          ${sidebarOpen ? 'w-64' : 'w-0 -translate-x-full'}
+        className={`fixed inset-y-0 left-0 z-40 w-64 flex flex-col transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/60`}
       >
         {/* Logo */}
