@@ -100,7 +100,7 @@ export default function Dashboard({ onViewIssue }) {
               <p className="text-body-md text-on-surface-variant mt-1 leading-tight">Response times for reports are 15% faster than last month.</p>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Recent Reports */}
         <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.5, duration: 0.8 } } }} className="md:col-span-12 space-y-3">
