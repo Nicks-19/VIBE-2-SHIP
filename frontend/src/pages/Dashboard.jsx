@@ -40,7 +40,7 @@ export default function Dashboard({ onViewIssue }) {
         className="grid grid-cols-1 md:grid-cols-12 gap-6"
       >
         {/* Map Snippet Card (8 columns on desktop) */}
-        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-8 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.5, duration: 0.8 } } }} className="md:col-span-8 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-title-md">Nearby Issues</h3>
             <button className="text-primary font-label-md hover:underline">View Full Map</button>
@@ -55,7 +55,7 @@ export default function Dashboard({ onViewIssue }) {
         </motion.section>
 
         {/* Leaderboard Card (4 columns on desktop) */}
-        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-4 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.5, duration: 0.8 } } }} className="md:col-span-4 space-y-3">
           <h3 className="font-title-md">Civic Standing</h3>
           <div className="glass-card rounded-xl p-6 h-full flex flex-col justify-center items-center text-center space-y-4 shadow-xl">
             <div className="w-20 h-20 bg-primary-container/80 text-on-primary-container rounded-full flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
@@ -73,7 +73,7 @@ export default function Dashboard({ onViewIssue }) {
         </motion.section>
 
         {/* Progress Charts Section */}
-        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.5, duration: 0.8 } } }} className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="glass-card rounded-xl p-6 flex items-center gap-6 shadow-xl">
             <div className="relative w-24 h-24 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90">
@@ -103,7 +103,7 @@ export default function Dashboard({ onViewIssue }) {
         </section>
 
         {/* Recent Reports */}
-        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-12 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.5, duration: 0.8 } } }} className="md:col-span-12 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-title-md">Your Recent Reports</h3>
             <button className="text-primary font-label-md">See All</button>
@@ -137,7 +137,7 @@ export default function Dashboard({ onViewIssue }) {
         </motion.section>
 
         {/* Notifications */}
-        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} className="md:col-span-12 space-y-3">
+        <motion.section variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.5, duration: 0.8 } } }} className="md:col-span-12 space-y-3">
           <h3 className="font-title-md">Alerts & Notifications</h3>
           <div className="space-y-2">
             <div className="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl border border-outline-variant/20 shadow-sm">

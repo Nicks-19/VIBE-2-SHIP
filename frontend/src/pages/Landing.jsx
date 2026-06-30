@@ -61,13 +61,13 @@ const Landing = () => {
           <motion.div 
             initial={{ opacity: 0, y: 30 }} 
             animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
             className="max-w-4xl space-y-6 relative z-10"
           >
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ delay: 0.2, type: "spring", bounce: 0.6 }}
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary mb-4"
             >
               <span className="material-symbols-outlined text-[16px]" data-icon="verified">verified</span>
@@ -76,7 +76,7 @@ const Landing = () => {
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ delay: 0.3, type: "spring", bounce: 0.5, duration: 0.8 }}
               className="font-display-lg text-display-lg md:text-[64px] md:leading-[1.1] text-on-surface tracking-tight"
             >
               Every citizen becomes a sensor. <br className="hidden md:block" />
@@ -85,7 +85,7 @@ const Landing = () => {
             <motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
+              transition={{ delay: 0.5, type: "spring", bounce: 0.4 }}
               className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto"
             >
               Real-time civic intelligence infrastructure. Automated reporting, predictive maintenance, and seamless citizen-to-state transparency powered by next-gen LLMs.
@@ -93,7 +93,7 @@ const Landing = () => {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
+              transition={{ delay: 0.6, type: "spring", bounce: 0.5 }}
               className="pt-8 flex flex-col md:flex-row gap-4 justify-center"
             >
               <Link to="/app" className="glass-card p-4 rounded-3xl flex flex-col md:flex-row items-center gap-4 transition-all hover:shadow-2xl hover:shadow-primary/20 group cursor-pointer border-white/5">
